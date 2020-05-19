@@ -20,7 +20,6 @@ import retrofit2.await
 class ReposRepositoryImpl(private val dao: ReposDao, private val api: GithubApi) : ReposRepository,
     KoinComponent {
 
-    private lateinit var pullRequestList: List<PullRequest>
     var repos: DataSource.Factory<Int, RepositoryDatabase>  =  dao.getRepositories()
     lateinit var boundaryCallback : ReposBoundaryCallback
 
@@ -35,13 +34,6 @@ class ReposRepositoryImpl(private val dao: ReposDao, private val api: GithubApi)
             .build()
 
         return RepoSearchResult(data, networkErrors)
-    }
-
-    override suspend fun getPullRequest(creator: String, repository: String): List<PullRequest> {
-        withContext(Dispatchers.IO) {
-            pullRequestList = api.getPullRequests(creator, repository)
-        }
-        return pullRequestList
     }
 
     companion object {

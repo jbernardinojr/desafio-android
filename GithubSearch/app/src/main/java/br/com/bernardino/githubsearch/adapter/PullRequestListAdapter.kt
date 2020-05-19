@@ -4,16 +4,18 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.paging.PagedList
+import androidx.paging.PagedListAdapter
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import br.com.bernardino.githubsearch.R
+import br.com.bernardino.githubsearch.database.RepositoryDatabase
 import br.com.bernardino.githubsearch.model.PullRequest
 import com.bumptech.glide.Glide
 import kotlinx.android.synthetic.main.list_item_pullrequest.view.*
 
 class PullRequestListAdapter (val mContext: Context, private val mClickListener: (String) -> Unit)
-    : RecyclerView.Adapter<PullRequestListAdapter.ViewHolder>() {
-
-    var pullRequest : List<PullRequest> = listOf()
+    : PagedListAdapter<PullRequest,PullRequestListAdapter.ViewHolder>(PULL_REQUEST_COMPARATOR) {
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         fun bindView(pullRequest: PullRequest, context: Context, clickListener: (String) -> Unit) {
@@ -39,19 +41,21 @@ class PullRequestListAdapter (val mContext: Context, private val mClickListener:
         return ViewHolder(view)
     }
 
-    override fun getItemCount(): Int {
-        return pullRequest.size
-    }
-
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val pullRequestItem = pullRequest[position]
+        val pullRequestItem = getItem(position)
         holder.let {
-            it.bindView(pullRequestItem, mContext, mClickListener)
+            pullRequestItem?.let { it1 -> it.bindView(it1, mContext, mClickListener) }
         }
     }
 
-    fun setPullRequestListItems (pr: List<PullRequest>) {
-        pullRequest = pr
-        notifyDataSetChanged()
+    companion object {
+        private val PULL_REQUEST_COMPARATOR = object : DiffUtil.ItemCallback<PullRequest>() {
+            override fun areItemsTheSame(oldItem: PullRequest, newItem: PullRequest): Boolean =
+                oldItem.id == newItem.id
+
+            override fun areContentsTheSame(oldItem: PullRequest, newItem: PullRequest): Boolean =
+                oldItem == newItem
+        }
     }
+
 }

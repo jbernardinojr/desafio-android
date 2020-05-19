@@ -11,15 +11,12 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
+        android:theme="@style/AppTheme.NoActionBar">
         <activity
             android:name=".ui.activities.PullRequestActivity"
-            android:label="@string/title_activity_pull_request1"
+            android:label="@string/title_activity_pull_request"
             android:parentActivityName=".ui.activities.HomeActivity"
-            android:theme="@style/AppTheme">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="br.com.bernardino.githubsearch.ui.activities.HomeActivity" />
+            android:theme="@style/AppTheme.NoActionBar">
         </activity>
         <activity
             android:name=".ui.activities.SplashActivity"
@@ -32,8 +29,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".ui.activities.HomeActivity"
-            android:parentActivityName=".ui.activities.SplashActivity"
-            android:theme="@style/AppTheme"/>
+            android:parentActivityName=".ui.activities.SplashActivity"/>
     </application>
 
 </manifest>

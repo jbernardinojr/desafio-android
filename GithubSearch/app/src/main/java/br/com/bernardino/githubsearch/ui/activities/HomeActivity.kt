@@ -3,15 +3,16 @@ package br.com.bernardino.githubsearch.ui.activities
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import androidx.appcompat.widget.Toolbar
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.DividerItemDecoration
 import br.com.bernardino.githubsearch.R
 import br.com.bernardino.githubsearch.adapter.ReposListAdapter
 import br.com.bernardino.githubsearch.database.RepositoryDatabase
 import br.com.bernardino.githubsearch.databinding.ActivityHomeBinding
-import br.com.bernardino.githubsearch.di.dataModule
+import br.com.bernardino.githubsearch.di.dataModulePullRequest
+import br.com.bernardino.githubsearch.di.dataModuleRepository
 import br.com.bernardino.githubsearch.di.databaseModule
 import br.com.bernardino.githubsearch.di.networkModule
 import br.com.bernardino.githubsearch.model.EXTRA_REPOSITORY
@@ -20,22 +21,21 @@ import br.com.bernardino.githubsearch.viewmodel.HomeActivityViewModel
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_home.*
 import org.koin.android.ext.android.inject
+import org.koin.androidx.viewmodel.ext.android.getViewModel
+import org.koin.core.context.loadKoinModules
 import org.koin.core.context.unloadKoinModules
 
 class HomeActivity : BaseActivity() {
 
     lateinit var mAdapter: ReposListAdapter
     lateinit var mBinding: ActivityHomeBinding
-    val reposImpl: ReposRepositoryImpl by inject()
     lateinit var mHomeActivityViewModel: HomeActivityViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_home)
 
-        mHomeActivityViewModel = ViewModelProviders.of(this, viewModelFactory {
-                HomeActivityViewModel(reposImpl)
-            }
-        ).get(HomeActivityViewModel::class.java)
+        mHomeActivityViewModel = getViewModel()
 
         mBinding = DataBindingUtil.setContentView(
             this,
@@ -44,17 +44,16 @@ class HomeActivity : BaseActivity() {
         mBinding.viewmodel = mHomeActivityViewModel
         mBinding.lifecycleOwner = this
 
-        supportActionBar?.setDisplayHomeAsUpEnabled(false)
-        supportActionBar?.setDisplayShowHomeEnabled(true)
-        supportActionBar?.setIcon(R.mipmap.ic_launcher)
+        configureToolbar(mBinding.homeToolbar, getString(R.string.app_name))
 
         configureList()
         attachObserver()
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        unloadKoinModules(listOf(dataModule, networkModule, databaseModule))
+    private fun configureToolbar(t: Toolbar, title: String) {
+        t.setNavigationIcon(R.drawable.ic_githubicon)
+        t.title = title
+        setSupportActionBar(t)
     }
 
     private fun attachObserver() {

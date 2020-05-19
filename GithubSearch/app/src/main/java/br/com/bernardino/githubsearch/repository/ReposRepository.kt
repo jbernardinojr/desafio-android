@@ -9,5 +9,9 @@ import org.koin.core.KoinComponent
 
 interface ReposRepository {
     fun refreshRepositories() : RepoSearchResult
-    suspend fun getPullRequest(creator: String, repository: String): List<PullRequest>
+    //suspend fun getPullRequest(creator: String, repository: String): PullRequest
+}
+
+interface ReposPullRequest {
+    suspend fun getPullRequest(creator: String, repository: String): PullRequest
 }

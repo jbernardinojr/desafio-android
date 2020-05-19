@@ -1,62 +1,56 @@
 package br.com.bernardino.githubsearch.viewmodel
 
-import android.app.Application
-import android.util.Log
 import androidx.lifecycle.*
+import androidx.paging.DataSource
+import androidx.paging.LivePagedListBuilder
+import androidx.paging.PagedList
+import br.com.bernardino.githubsearch.datasource.PullRequestDataSource
 import br.com.bernardino.githubsearch.model.PullRequest
-import br.com.bernardino.githubsearch.repository.ReposRepository
-import br.com.bernardino.githubsearch.repository.ReposRepositoryImpl
-import kotlinx.coroutines.launch
-import java.io.IOException
+import br.com.bernardino.githubsearch.network.GithubApi
+import kotlinx.coroutines.Dispatchers
 
 class PullRequestActivityViewModel(
-    private val reposRepository : ReposRepository,
+    githubApi: GithubApi,
     creator: String,
     repository: String
 ) : ViewModel() {
 
-    private var pullRequest : List<PullRequest> = listOf()
-
-    private var _pullRequestLiveData = MutableLiveData<List<PullRequest>>()
-    val pullRequestLiveData : LiveData<List<PullRequest>>
-        get() = _pullRequestLiveData
 
     private var _isLoading = MutableLiveData<Boolean>()
     val isLoading : LiveData<Boolean>
         get() = _isLoading
 
-    private var _eventNetworkError = MutableLiveData<Boolean>(false)
-    val eventNetworkError: LiveData<Boolean>
-        get() = _eventNetworkError
-
-    private var _isNetworkErrorShown = MutableLiveData<Boolean>(false)
-    val isNetworkErrorShown: LiveData<Boolean>
-        get() = _isNetworkErrorShown
+    private var _postsLiveData : LiveData<PagedList<PullRequest>>
 
     init {
-        readPullRequestAPI(creator, repository)
+        val config = PagedList.Config.Builder()
+            .setPageSize(PAGE_SIZE)
+            .setEnablePlaceholders(false)
+            .build()
+        _postsLiveData  = initializedPagedListBuilder(config, githubApi, creator, repository).build()
     }
 
-    private fun readPullRequestAPI (creator: String, repository: String) {
-        viewModelScope.launch {
-            try {
-                _isLoading.value = true
-                pullRequest = reposRepository.getPullRequest(creator, repository)
-                _pullRequestLiveData.value = pullRequest
-                _eventNetworkError.value = false
-                _isNetworkErrorShown.value = false
-                _isLoading.value = false
+    fun getPullRequest() : LiveData<PagedList<PullRequest>> = _postsLiveData
 
-            } catch (networkError: IOException) {
-                // Show a Toast error message and hide the progress bar.
-                _isLoading.value = false
-                if(pullRequestLiveData.value.isNullOrEmpty())
-                    _eventNetworkError.value = true
+    private fun initializedPagedListBuilder(config: PagedList.Config, githubApi: GithubApi, creator: String, repositoryName: String):
+            LivePagedListBuilder<Int, PullRequest> {
+
+        _isLoading.postValue(true)
+        val pullRequestSourceLiveData = MutableLiveData<PullRequestDataSource>()
+
+        val dataSourceFactory = object : DataSource.Factory<Int, PullRequest>() {
+            override fun create(): DataSource<Int, PullRequest> {
+                val  pullRequestDataSource = PullRequestDataSource(Dispatchers.IO, githubApi, creator, repositoryName)
+                pullRequestSourceLiveData.postValue(pullRequestDataSource)
+                return pullRequestDataSource
             }
+
         }
+        _isLoading.postValue(false)
+        return LivePagedListBuilder(dataSourceFactory, config)
     }
 
-    fun onNetworkErrorShown() {
-        _isNetworkErrorShown.value = true
+    companion object {
+        private const val PAGE_SIZE = 45
     }
 }
