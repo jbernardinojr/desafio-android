@@ -44,17 +44,12 @@ class HomeActivity : BaseActivity() {
         mBinding.viewmodel = mHomeActivityViewModel
         mBinding.lifecycleOwner = this
 
-        configureToolbar(mBinding.homeToolbar, getString(R.string.app_name))
+        setSupportActionBar(mBinding.homeToolbar)
 
         configureList()
         attachObserver()
     }
 
-    private fun configureToolbar(t: Toolbar, title: String) {
-        t.setNavigationIcon(R.drawable.ic_githubicon)
-        t.title = title
-        setSupportActionBar(t)
-    }
 
     private fun attachObserver() {
         mHomeActivityViewModel.repos.observe(this, Observer {

@@ -4,8 +4,10 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-        <variable name="viewmodel"
-            type="br.com.bernardino.githubsearch.viewmodel.HomeActivityViewModel"/>
+
+        <variable
+            name="viewmodel"
+            type="br.com.bernardino.githubsearch.viewmodel.HomeActivityViewModel" />
     </data>
 
 
@@ -18,14 +20,19 @@
             android:id="@+id/appbar"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            app:elevation="4dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
             ​
+
             <androidx.appcompat.widget.Toolbar
                 android:id="@+id/home_toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
+                app:navigationIcon="@mipmap/ic_launcher"
+                app:title="@string/app_name"
+                android:elevation="4dp"
                 android:theme="@style/DefaultToolbar"
                 app:popupTheme="@style/PopupMenu" />
             ​
@@ -45,7 +52,8 @@
             app:layout_constraintVertical_bias="1.0"
             tools:listitem="@layout/list_item_repos" />
 
-        <TextView android:id="@+id/emptyList"
+        <TextView
+            android:id="@+id/emptyList"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:gravity="center"
@@ -55,7 +63,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"/>
+            app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

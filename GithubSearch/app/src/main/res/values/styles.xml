@@ -60,9 +60,11 @@
         <item name="android:src">@drawable/ic_githubicon</item>
     </style>
 
-    <style name="DefaultToolbar" parent="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+    <style name="DefaultToolbar" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
         <item name="android:background">@color/colorBlack</item>
         <item name="android:textColorPrimary">@color/colorWhite</item>
+        <item name="android:elevation">4dp</item>
+        <item name="colorOnPrimary">@color/colorBlack</item>
     </style>
 
     <style name="PopupMenu" parent="Widget.AppCompat.PopupMenu">
