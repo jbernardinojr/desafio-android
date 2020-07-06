@@ -16,6 +16,9 @@ interface GithubApi : KoinComponent {
     @GET("search/repositories?q=language:Java&sort=stars")
     suspend fun getRepositories(@Query("page") page: Int) : RepositoryBody
     @GET ("repos/{creator}/{repository}/pulls")
-    suspend fun getPullRequests (@Path("creator") creator: String?,
-                                 @Path("repository") repository : String?, @Query ("pagesize") pageSize : Int, @Query("page") page: Int) : List<PullRequest>
+    suspend fun getPullRequests (@Path("creator") creator: String?
+                                 , @Path("repository") repository : String?
+                                 , @Query ("per_page") items_per_page : Int
+                                 , @Query("page") page: Int
+                                ) : List<PullRequest>
 }

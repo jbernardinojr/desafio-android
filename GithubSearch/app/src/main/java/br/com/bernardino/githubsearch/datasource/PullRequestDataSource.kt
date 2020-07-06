@@ -17,6 +17,8 @@ class PullRequestDataSource(
     private val job = Job()
     private val scope = CoroutineScope(coroutineContext + job)
 
+    private var lastLoadPage = FIRST_PAGE
+
     override fun loadInitial(
         params: LoadInitialParams<Int>,
         callback: LoadInitialCallback<Int, PullRequest>
@@ -25,9 +27,10 @@ class PullRequestDataSource(
         scope.launch {
             try {
                 val response =
-                    api.getPullRequests(creator, repositoryName, numbersOfItems, FIRST_PAGE)
+                    api.getPullRequests(creator, repositoryName, numbersOfItems, 0)
                 response?.let {
-                    callback.onResult(it, FIRST_PAGE, PAGE_SIZE)
+                    callback.onResult(it, 0, numbersOfItems)
+                    lastLoadPage++
                 }
 
             } catch (exception: Exception) {
@@ -44,10 +47,11 @@ class PullRequestDataSource(
         scope.launch {
             try {
                 val response =
-                    api.getPullRequests(creator, repositoryName, PAGE_SIZE,FIRST_PAGE + 1)
+                    api.getPullRequests(creator, repositoryName, numberOfItems, page)
 
                 response.let {
-                    callback.onResult(it, numberOfItems)
+                    callback.onResult(it, lastLoadPage)
+                    lastLoadPage++
                 }
 
             } catch (exception: Exception) {
@@ -58,22 +62,6 @@ class PullRequestDataSource(
     }
 
     override fun loadBefore(params: LoadParams<Int>, callback: LoadCallback<Int, PullRequest>) {
-        val page = params.key
-
-        scope.launch {
-            try {
-                val adjacentKey = if (params.key > 1) params.key - 1 else  null;
-                val response =
-                    api.getPullRequests(creator, repositoryName, PAGE_SIZE, page)
-
-                response.let {
-                    callback.onResult(it, adjacentKey)
-                }
-
-            } catch (exception: Exception) {
-                Log.e("PostsDataSource", "Failed to fetch data: ${exception.message}")
-            }
-        }
 
     }
 
@@ -84,7 +72,7 @@ class PullRequestDataSource(
 
     companion object{
         const val   FIRST_PAGE = 1
-        const val   PAGE_SIZE = 45
+        const val   PAGE_SIZE = 10
     }
 
 }

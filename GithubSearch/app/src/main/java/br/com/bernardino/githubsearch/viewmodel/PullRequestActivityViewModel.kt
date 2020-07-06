@@ -4,7 +4,7 @@ import androidx.lifecycle.*
 import androidx.paging.DataSource
 import androidx.paging.LivePagedListBuilder
 import androidx.paging.PagedList
-import br.com.bernardino.githubsearch.datasource.PullRequestDataSource
+import br.com.bernardino.githubsearch.datasource.PullRequestDataSourceFactory
 import br.com.bernardino.githubsearch.model.PullRequest
 import br.com.bernardino.githubsearch.network.GithubApi
 import kotlinx.coroutines.Dispatchers
@@ -36,13 +36,10 @@ class PullRequestActivityViewModel(
             LivePagedListBuilder<Int, PullRequest> {
 
         _isLoading.postValue(true)
-        val pullRequestSourceLiveData = MutableLiveData<PullRequestDataSource>()
 
         val dataSourceFactory = object : DataSource.Factory<Int, PullRequest>() {
             override fun create(): DataSource<Int, PullRequest> {
-                val  pullRequestDataSource = PullRequestDataSource(Dispatchers.IO, githubApi, creator, repositoryName)
-                pullRequestSourceLiveData.postValue(pullRequestDataSource)
-                return pullRequestDataSource
+                return PullRequestDataSourceFactory(Dispatchers.IO, githubApi, creator, repositoryName).create()
             }
 
         }
@@ -51,6 +48,6 @@ class PullRequestActivityViewModel(
     }
 
     companion object {
-        private const val PAGE_SIZE = 45
+        private const val PAGE_SIZE = 10
     }
 }
